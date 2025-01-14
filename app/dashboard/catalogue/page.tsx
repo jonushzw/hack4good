@@ -1,7 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-const initialItems = [
+interface Item {
+    id: number;
+    name: string;
+    image: string;
+    qty: number;
+}
+
+const initialItems: Item[] = [
     { id: 1, name: 'Milo', image: '/milo.jpg', qty: 0 },
     { id: 2, name: 'Chips', image: '/chips.jpg', qty: 4 },
     { id: 3, name: 'Apple Juice', image: '/applejuice.jpg', qty: 2 },
@@ -9,10 +16,10 @@ const initialItems = [
 ];
 
 export default function Catalog() {
-    const [items, setItems] = useState(initialItems);
+    const [items, setItems] = useState<Item[]>(initialItems);
     const [popupVisible, setPopupVisible] = useState(false);
     const [confirmationPopupVisible, setConfirmationPopupVisible] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState<Item | null>(null);
     const [voucherNumber, setVoucherNumber] = useState(10);
 
     useEffect(() => {
@@ -23,7 +30,7 @@ export default function Catalog() {
     const availableProducts = items.filter(item => item.qty > 0);
     const preOrderProducts = items.filter(item => item.qty <= 0);
 
-    const handleButtonClick = (item) => {
+    const handleButtonClick = (item: Item) => {
         setSelectedItem(item);
         setPopupVisible(true);
     };
@@ -41,7 +48,7 @@ export default function Catalog() {
         if (voucherNumber > 0) {
             setVoucherNumber(voucherNumber - 1);
             const updatedItems = items.map(item =>
-                item.id === selectedItem.id ? { ...item, qty: item.qty - 1 } : item
+                item.id === selectedItem?.id ? { ...item, qty: item.qty - 1 } : item
             );
             setItems(updatedItems);
             setPopupVisible(false);
@@ -82,9 +89,9 @@ export default function Catalog() {
             {popupVisible && (
                 <div style={styles.popupOverlay}>
                     <div style={styles.popup}>
-                        <h2>{selectedItem.name}</h2>
-                        <img src={selectedItem.image} alt={selectedItem.name} style={styles.itemImage} />
-                        <p>Are you sure you want to {selectedItem.qty > 0 ? 'buy' : 'pre-order'} this item?</p>
+                        <h2>{selectedItem?.name ?? ''}</h2>
+                        <img src={selectedItem?.image ?? ''} alt={selectedItem?.name ?? ''} style={styles.itemImage}/>
+                        <p>Are you sure you want to {selectedItem?.qty > 0 ? 'buy' : 'pre-order'} this item?</p>
                         <div style={styles.buttonContainer}>
                             <button onClick={confirmPurchase} style={styles.confirmButton}>Confirm</button>
                             <button onClick={closePopup} style={styles.closeButton}>Close</button>
