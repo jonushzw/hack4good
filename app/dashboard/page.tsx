@@ -16,17 +16,17 @@ export default function Home() {
             process.env.NEXT_PUBLIC_SUPABASE_KEY!,
             {
                 global: {
-                    fetch: async (url, options = {}) => {
+                    fetch: async (url, options: RequestInit = {}) => {
                         const clerkToken = await session?.getToken({
                             template: 'supabase',
                         });
 
-                        const headers = new Headers(options?.headers);
+                        const headers = new Headers(options.headers);
                         headers.set('Authorization', `Bearer ${clerkToken}`);
 
                         return fetch(url, {
                             ...options,
-                            headers,
+                            headers: headers as HeadersInit,
                         });
                     },
                 },
@@ -41,12 +41,14 @@ export default function Home() {
 
         async function loadTasks() {
             setLoading(true);
-            console.log('User ID:', user.id); // Log user ID
-            const { data, error } = await client
-                .from('tasks')
-                .select()
-                .eq('user_id', user.id);
-            if (!error) setTasks(data);
+            if (user) {
+                console.log('User ID:', user.id); // Log user ID
+                const { data, error } = await client
+                    .from('tasks')
+                    .select()
+                    .eq('user_id', user.id);
+                if (!error) setTasks(data);
+            }
             setLoading(false);
         }
 
