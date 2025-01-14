@@ -3,8 +3,6 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import CustomSignInButton from "@/components/CustomSignInButton";
 import React from "react";
-import { UserButton, useUser } from "@clerk/nextjs";
-import Link from 'next/link';
 
 export default async function Page() {
   // Get the userId from auth() -- if null, the user is not signed in
@@ -35,20 +33,24 @@ export default async function Page() {
       <div style={{ marginTop: '20px', position: 'relative', zIndex: 2 }}>
       <CustomSignInButton style ={styles.ctaButton} /> {/* Apply the button style */}
       </div>
-      <div style={{ marginTop: '20px' }}>
-        <Link href="/catalogue">
-          <button style={styles.navButton}>Go to Catalog</button>
-        </Link>
-      </div>
       </div>
   );
 };
 
 const styles: { [key: string]: CSSProperties } = {
   container: {
-    fontFamily: 'Inter, sans-serif',
     padding: '20px',
-    textAlign: 'center',
+    textAlign: 'center' as 'center', // Ensure type compatibility
+  },
+  voucherBox: {
+    marginBottom: '20px',
+    padding: '10px',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    textAlign: 'center' as 'center', // Ensure type compatibility
+  },
+  tableContainer: {
+    marginTop: '20px',
   },
   header: {
     position: 'relative',
