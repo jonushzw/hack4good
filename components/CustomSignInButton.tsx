@@ -5,7 +5,7 @@ import { SignInButton } from '@clerk/nextjs';
 
 const CustomSignInButton = () => {
     return (
-        <SignInButton aftersigninurl="/dashboard">
+        <SignInButton>
             <button style={styles.button}>
                 Sign In
             </button>

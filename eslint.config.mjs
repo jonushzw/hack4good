@@ -1,7 +1,6 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
-import { ESLint } from "eslint";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,10 +27,5 @@ const eslintConfig = [
     },
   },
 ];
-
-const eslint = new ESLint({
-  cwd: __dirname,
-  resolvePluginsRelativeTo: __dirname,
-});
 
 export default eslintConfig;
