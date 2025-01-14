@@ -7,7 +7,7 @@ export default function Header() {
 
     return (
         <header style={styles.header}>
-            <div style={styles.logo}>LOGO</div>
+            <div style={styles.logo}><img src={"logo.png"} alt="Logo" style={styles.logoImage}></img></div>
             {isSignedIn && (
                 <div style={styles.userSection}>
                     <h1 style={styles.username}>{user?.username}</h1>
@@ -41,5 +41,9 @@ const styles = {
         marginRight: '10px',
         fontWeight: 'semi bold',
         color: 'white',
+    },
+    logoImage: {
+        width: '70px', // Adjust the size as needed
+        height: 'auto',
     },
 };
