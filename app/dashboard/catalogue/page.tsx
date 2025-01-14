@@ -92,7 +92,9 @@ export default function Catalog() {
                     <div style={styles.popup}>
                         <h2>{selectedItem?.name ?? ''}</h2>
                         <img src={selectedItem?.image ?? ''} alt={selectedItem?.name ?? ''} style={styles.itemImage}/>
-                        <p>Are you sure you want to {selectedItem?.qty > 0 ? 'buy' : 'pre-order'} this item?</p>
+                        <p>Are you sure you want
+                            to {selectedItem?.qty !== undefined && selectedItem.qty > 0 ? 'buy' : 'pre-order'} this
+                            item?</p>
                         <div style={styles.buttonContainer}>
                             <button onClick={confirmPurchase} style={styles.confirmButton}>Confirm</button>
                             <button onClick={closePopup} style={styles.closeButton}>Close</button>
