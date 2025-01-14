@@ -20,29 +20,20 @@ export default async function Page() {
   return (
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={styles.title}>Muhammadiyah Welfare Home Minimart and Voucher System</h1>
+          <div style={styles.headerOverlay}></div> 
+          <h1 style={styles.title}>
+          <strong>Muhammadiyah Welfare Home</strong> <br />
+            Online Shop</h1>
           <p style={styles.description}>
-            Empowering residents with a user-friendly platform to request products, earn vouchers, and manage their accounts, while providing admins with robust management and reporting tools.
+            Sign in below to view shop
           </p>
-          <CustomSignInButton />
+          
         </header>
-        <section style={styles.featuresSection}>
-          <h2 style={styles.sectionTitle}>Key Features for Residents</h2>
-          <ul style={styles.featuresList}>
-            <li style={styles.featureItem}>Access a user-friendly dashboard to view voucher balances, transaction history, and available products.</li>
-            <li style={styles.featureItem}>Easily request items from the minimart or place preorders for out-of-stock products.</li>
-            <li style={styles.featureItem}>Secure login system with optional password reset via mobile.</li>
-          </ul>
-        </section>
-        <section style={styles.featuresSection}>
-          <h2 style={styles.sectionTitle}>Key Features for Admins</h2>
-          <ul style={styles.featuresList}>
-            <li style={styles.featureItem}>Manage users, including adding, suspending, and resetting passwords.</li>
-            <li style={styles.featureItem}>Approve or reject voucher tasks and product requests with detailed tracking.</li>
-            <li style={styles.featureItem}>Maintain and update inventory with audit logs for accountability.</li>
-            <li style={styles.featureItem}>Generate comprehensive reports, such as weekly requests and inventory summaries.</li>
-          </ul>
-        </section>
+
+      <div style={{ marginTop: '20px', position: 'relative', zIndex: 2 }}>
+      <CustomSignInButton style={styles.ctaButton} /> {/* Apply the button style */}
+      </div>
+
       </div>
   );
 };
@@ -54,16 +45,34 @@ const styles: { [key: string]: CSSProperties } = {
     textAlign: 'center',
   },
   header: {
-    backgroundColor: '#1d6dbd',
+    position: 'relative',
+    backgroundImage: 'url(/sign%20in%20background.jpg)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
     color: 'white',
-    padding: '40px 20px',
+    padding: '100px 20px',
+    zIndex: 0,
+  },
+  headerOverlay: {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adjust the transparency here
+    zIndex: 0,
   },
   title: {
     fontSize: '36px',
+    position: 'relative',
+    zIndex: 1,
     margin: '0 0 20px',
   },
   description: {
     fontSize: '18px',
+    position: 'relative',
+    zIndex: 1,
     margin: '0 0 20px',
   },
   ctaButton: {
@@ -74,6 +83,8 @@ const styles: { [key: string]: CSSProperties } = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+    zIndex: 2,
+    position: 'relative',
   },
   featuresSection: {
     margin: '40px 0',
@@ -90,4 +101,4 @@ const styles: { [key: string]: CSSProperties } = {
   featureItem: {
     margin: '10px 0',
   },
-}
+};
