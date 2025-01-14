@@ -3,6 +3,8 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import CustomSignInButton from "@/components/CustomSignInButton";
 import React from "react";
+import { UserButton, useUser } from "@clerk/nextjs";
+import Link from 'next/link';
 
 export default async function Page() {
   // Get the userId from auth() -- if null, the user is not signed in
@@ -33,7 +35,11 @@ export default async function Page() {
       <div style={{ marginTop: '20px', position: 'relative', zIndex: 2 }}>
       <CustomSignInButton style={styles.ctaButton} /> {/* Apply the button style */}
       </div>
-
+      <div style={{ marginTop: '20px' }}>
+        <Link href="/catalogue">
+          <button style={styles.navButton}>Go to Catalog</button>
+        </Link>
+      </div>
       </div>
   );
 };
