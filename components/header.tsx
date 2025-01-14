@@ -7,8 +7,8 @@ export default function Header() {
 
     return (
         <header style={styles.header}>
-            <div style={styles.logo}><img src="logo.png" alt="Logo" style={{width:"70px",height:"auto"}}/></div>
-            {isSignedIn && (
+            <div style={styles.logo}><img src="/logo.png" alt="Logo" style={{width:"70px",height:"auto"}}/></div>
+            {isLoaded && isSignedIn && (
                 <div style={styles.userSection}>
                     <h1 style={styles.username}>{user?.username}</h1>
                     <UserButton />
