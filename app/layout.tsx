@@ -1,9 +1,5 @@
 import {
     ClerkProvider,
-    SignInButton,
-    SignedIn,
-    SignedOut,
-    UserButton
 } from '@clerk/nextjs'
 import './globals.css'
 import Header from "@/components/header";
@@ -13,7 +9,7 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <ClerkProvider>
+        <ClerkProvider afterSignOutUrl="/">
             <html lang="en">
             <body>
             <Header />
