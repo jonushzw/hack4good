@@ -31,7 +31,7 @@ export default async function Page() {
         </header>
 
       <div style={{ marginTop: '20px', position: 'relative', zIndex: 2 }}>
-      <CustomSignInButton style={styles.ctaButton} /> {/* Apply the button style */}
+      <CustomSignInButton style ={styles.ctaButton} /> {/* Apply the button style */}
       </div>
 
       </div>
