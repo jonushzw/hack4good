@@ -2,9 +2,9 @@
 import { useState } from 'react';
 
 const initialItems = [
-    { id: 1, name: 'Milo', image: 'milo.jpg ', qty: 0 },
-    { id: 2, name: 'Chips', image: 'chips.jpg', qty: 4 },
-    { id: 3, name: 'Apple Juice', image: 'applejuice.jpg', qty: 2 },
+    { id: 1, name: 'Milo', image: '/milo.jpg', qty: 0 },
+    { id: 2, name: 'Chips', image: '/chips.jpg', qty: 4 },
+    { id: 3, name: 'Apple Juice', image: '/applejuice.jpg', qty: 2 },
     // Add more items as needed
 ];
 

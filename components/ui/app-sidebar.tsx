@@ -20,13 +20,13 @@ const items = [
         icon: Home,
     },
     {
-        title: "Vouchers/Transaction History",
-        url: "#",
+        title: "Profile",
+        url: "/dashboard/profile",
         icon: Inbox,
     },
     {
-        title: "Marketplace",
-        url: "#",
+        title: "Catalogue",
+        url: "/dashboard/catalogue",
         icon: Search,
     },
     {
