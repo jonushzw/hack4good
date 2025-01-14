@@ -1,20 +1,19 @@
 'use client';
 
-import {SignedIn, SignedOut, SignInButton, UserButton} from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 
 export default function Header() {
+    const { isLoaded, isSignedIn, user } = useUser();
+
     return (
         <header style={styles.header}>
             <div style={styles.logo}>LOGO</div>
-            <SignedOut>
-                <SignInButton>
-                    <button className={'btn btn-primary'}>Login</button>
-                </SignInButton>
-            </SignedOut>
-            <SignedIn>
-                <UserButton />
-            </SignedIn>
-
+            {isSignedIn && (
+                <div style={styles.userSection}>
+                    <h1 style={styles.username}>{user?.username}</h1>
+                    <UserButton />
+                </div>
+            )}
         </header>
     );
 }
@@ -30,9 +29,17 @@ const styles = {
     logo: {
         fontSize: '24px',
         fontWeight: 'bold',
+        color: 'white',
     },
-    authButtons: {
+    userSection: {
         display: 'flex',
         alignItems: 'center',
+    },
+    username: {
+        fontSize: '20px',
+        fontFamily: 'Inter, sans-serif',
+        marginRight: '10px',
+        fontWeight: 'semi bold',
+        color: 'white',
     },
 };
