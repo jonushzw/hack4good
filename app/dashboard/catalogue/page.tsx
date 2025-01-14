@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { CSSProperties } from "react";
 
 interface Item {
     id: number;
@@ -113,7 +114,7 @@ export default function Catalog() {
     );
 }
 
-const styles = {
+const styles: { [key: string]: CSSProperties } = {
     catalog: {
         padding: '20px',
     },
@@ -134,7 +135,7 @@ const styles = {
         textAlign: 'center',
         height: '300px',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as 'column', // Ensure type compatibility
         justifyContent: 'space-between',
     },
     itemImage: {
@@ -143,7 +144,6 @@ const styles = {
         maxHeight: '150px',
         objectFit: 'contain',
     },
-
     buyButton: {
         marginTop: '10px',
         padding: '10px 20px',
