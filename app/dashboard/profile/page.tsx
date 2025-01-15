@@ -1,4 +1,5 @@
 import React from 'react';
+import { CSSProperties } from "react";
 
 import {
   Table,
@@ -99,7 +100,7 @@ export default function Profile() {
   );
 }
 
-const styles = {
+const styles: { [key: string]: CSSProperties } = {
   container: {
     padding: '20px',
   },
@@ -108,7 +109,7 @@ const styles = {
     padding: '10px',
     border: '1px solid #ccc',
     borderRadius: '5px',
-    textAlign: 'center',
+    textAlign: 'center' as 'center', // Ensure type compatibility
   },
   tableContainer: {
     marginTop: '20px',

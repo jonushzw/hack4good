@@ -1,7 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { CSSProperties } from "react";
 
-const initialItems = [
+interface Item {
+    id: number;
+    name: string;
+    image: string;
+    qty: number;
+}
+
+const initialItems: Item[] = [
     { id: 1, name: 'Milo', image: '/milo.jpg', qty: 0 },
     { id: 2, name: 'Chips', image: '/chips.jpg', qty: 4 },
     { id: 3, name: 'Apple Juice', image: '/applejuice.jpg', qty: 2 },
@@ -9,16 +17,21 @@ const initialItems = [
 ];
 
 export default function Catalog() {
-    const [items, setItems] = useState(initialItems);
+    const [items, setItems] = useState<Item[]>(initialItems);
     const [popupVisible, setPopupVisible] = useState(false);
     const [confirmationPopupVisible, setConfirmationPopupVisible] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState<Item | null>(null);
     const [voucherNumber, setVoucherNumber] = useState(10);
+
+    useEffect(() => {
+        // Ensure the state is consistent between server and client
+        setItems(initialItems);
+    }, []);
 
     const availableProducts = items.filter(item => item.qty > 0);
     const preOrderProducts = items.filter(item => item.qty <= 0);
 
-    const handleButtonClick = (item) => {
+    const handleButtonClick = (item: Item) => {
         setSelectedItem(item);
         setPopupVisible(true);
     };
@@ -35,8 +48,8 @@ export default function Catalog() {
     const confirmPurchase = () => {
         if (voucherNumber > 0) {
             setVoucherNumber(voucherNumber - 1);
-            const updatedItems = items.map(item => 
-                item.id === selectedItem.id ? { ...item, qty: item.qty - 1 } : item
+            const updatedItems = items.map(item =>
+                item.id === selectedItem?.id ? { ...item, qty: item.qty - 1 } : item
             );
             setItems(updatedItems);
             setPopupVisible(false);
@@ -77,9 +90,11 @@ export default function Catalog() {
             {popupVisible && (
                 <div style={styles.popupOverlay}>
                     <div style={styles.popup}>
-                        <h2>{selectedItem.name}</h2>
-                        <img src={selectedItem.image} alt={selectedItem.name} style={styles.itemImage} />
-                        <p>Are you sure you want to {selectedItem.qty > 0 ? 'buy' : 'pre-order'} this item?</p>
+                        <h2>{selectedItem?.name ?? ''}</h2>
+                        <img src={selectedItem?.image ?? ''} alt={selectedItem?.name ?? ''} style={styles.itemImage}/>
+                        <p>Are you sure you want
+                            to {selectedItem?.qty !== undefined && selectedItem.qty > 0 ? 'buy' : 'pre-order'} this
+                            item?</p>
                         <div style={styles.buttonContainer}>
                             <button onClick={confirmPurchase} style={styles.confirmButton}>Confirm</button>
                             <button onClick={closePopup} style={styles.closeButton}>Close</button>
@@ -101,7 +116,7 @@ export default function Catalog() {
     );
 }
 
-const styles = {
+const styles: { [key: string]: CSSProperties } = {
     catalog: {
         padding: '20px',
     },
@@ -120,9 +135,9 @@ const styles = {
         borderRadius: '8px',
         padding: '10px',
         textAlign: 'center',
-        height: '300px', 
+        height: '300px',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as 'column', // Ensure type compatibility
         justifyContent: 'space-between',
     },
     itemImage: {
@@ -131,7 +146,6 @@ const styles = {
         maxHeight: '150px',
         objectFit: 'contain',
     },
-    
     buyButton: {
         marginTop: '10px',
         padding: '10px 20px',
@@ -151,7 +165,7 @@ const styles = {
         cursor: 'pointer',
     },
     spacer: {
-        height: '50px', 
+        height: '50px',
     },
     popupOverlay: {
         position: 'fixed',
