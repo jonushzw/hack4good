@@ -28,11 +28,16 @@ export default function TestCatalogue() {
             {
                 global: {
                     fetch: async (url, options: RequestInit = {}) => {
+                        const clerkToken = await session?.getToken({
+                            template: 'supabase',
+                        });
+
                         const headers = new Headers(options.headers);
-                        headers.set('Authorization', `Bearer ${session?.accessToken}`);
+                        headers.set('Authorization', `Bearer ${clerkToken}`);
+
                         return fetch(url, {
                             ...options,
-                            headers,
+                            headers: headers as HeadersInit,
                         });
                     },
                 },
@@ -56,15 +61,17 @@ export default function TestCatalogue() {
                 const productsWithImages = data.map((product: { id: number; name: string; description: string; price: number; stock_quantity: number; }) => {
                     let imageUrl = '';
                     switch (product.name) {
-                        case 'Milo Chips':
-                            imageUrl = '/images/milo_chips.jpg';
+                        case 'Milo':
+                            imageUrl = '/milo.jpg';
+                            break;
+                        case 'Chips':
+                            imageUrl = '/chips.jpg';
                             break;
                         case 'Apple Juice':
-                            imageUrl = '/images/apple_juice.jpg';
+                            imageUrl = '/applejuice.jpg';
                             break;
                         default:
-                            imageUrl = '/images/default.jpg';
-                            break;
+                            imageUrl = '/default.jpg';
                     }
                     return { ...product, image: imageUrl };
                 });
@@ -153,11 +160,11 @@ export default function TestCatalogue() {
                 {availableProducts.map(product => (
                     <div key={product.id} style={styles.itemCard}>
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
-                        <div style={styles.itemName}>{product.name}</div>
-                        <div style={styles.itemDescription}>{product.description}</div>
-                        <div style={styles.itemPrice}>${product.price}</div>
-                        <div style={styles.itemStock}>In Stock: {product.stock_quantity}</div>
-                        <button style={styles.buyButton} onClick={() => handleButtonClick(product)}>Buy</button>
+                        <h2 style={styles.itemName}>{product.name}</h2>
+                        <p style={styles.itemDescription}>{product.description}</p>
+                        <p style={styles.itemPrice}>Price: {product.price} Voucher(s)</p>
+                        <p style={styles.itemStock}>Stock: {product.stock_quantity}</p>
+                        <button style={styles.buyButton} onClick={() => handleButtonClick(product)}>Buy Now</button>
                     </div>
                 ))}
             </div>
@@ -169,11 +176,11 @@ export default function TestCatalogue() {
                 {preOrderProducts.map(product => (
                     <div key={product.id} style={styles.itemCard}>
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
-                        <div style={styles.itemName}>{product.name}</div>
-                        <div style={styles.itemDescription}>{product.description}</div>
-                        <div style={styles.itemPrice}>${product.price}</div>
-                        <div style={styles.itemStock}>Out of Stock</div>
-                        <button style={styles.preOrderButton} onClick={() => handleButtonClick(product)}>Pre-Order</button>
+                        <h2 style={styles.itemName}>{product.name}</h2>
+                        <p style={styles.itemDescription}>{product.description}</p>
+                        <p style={styles.itemPrice}>Price: {product.price} Voucher(s)</p>
+                        <p style={styles.itemStock}>Stock: {product.stock_quantity}</p>
+                        <button style={styles.preOrderButton} onClick={() => handleButtonClick(product)}>Pre-Order Now</button>
                     </div>
                 ))}
             </div>
@@ -181,11 +188,13 @@ export default function TestCatalogue() {
             {popupVisible && (
                 <div style={styles.popupOverlay}>
                     <div style={styles.popup}>
-                        <h2>{selectedProduct?.name}</h2>
-                        <p>{selectedProduct?.description}</p>
-                        <p>Price: ${selectedProduct?.price}</p>
-                        <button style={styles.closeButton} onClick={closePopup}>Close</button>
-                        <button style={styles.buyButton} onClick={handlePurchase}>Purchase</button>
+                        <h2>{selectedProduct?.name ?? ''}</h2>
+                        <img src={selectedProduct?.image ?? ''} alt={selectedProduct?.name ?? ''} style={styles.itemImage}/>
+                        <p>Are you sure you want to {selectedProduct?.stock_quantity !== undefined && selectedProduct.stock_quantity > 0 ? 'buy' : 'pre-order'} this item?</p>
+                        <div style={styles.buttonContainer}>
+                            <button style={styles.closeButton} onClick={closePopup}>Cancel</button>
+                            <button style={styles.closeButton} onClick={handlePurchase}>Confirm</button>
+                        </div>
                     </div>
                 </div>
             )}
