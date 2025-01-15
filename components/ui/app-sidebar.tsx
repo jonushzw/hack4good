@@ -38,7 +38,7 @@ const items = [
 
 export function AppSidebar() {
     return (
-        <Sidebar style={{ marginTop: '90px' }}> {/* Adjust margin as needed */}
+        <Sidebar style={{ marginTop: '100px' }}> {/* Adjust margin as needed */}
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Navigation</SidebarGroupLabel>
