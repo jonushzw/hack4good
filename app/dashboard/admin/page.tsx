@@ -1,4 +1,3 @@
-// In the AdminPage component
 import Link from 'next/link';
 import { createClerkClient } from '@clerk/nextjs/server';
 import { currentUser } from "@clerk/nextjs/server";
