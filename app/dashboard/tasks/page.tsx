@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useSession, useUser } from '@clerk/nextjs';
 import { createClient } from '@supabase/supabase-js';
+import UserMetadata from "@/components/userMetadata";
 
 export default function Home() {
     const [tasks, setTasks] = useState<any[]>([]);
@@ -127,6 +128,7 @@ export default function Home() {
                 />
                 <button type="submit">Add</button>
             </form>
+            <UserMetadata />
         </div>
     );
 }
