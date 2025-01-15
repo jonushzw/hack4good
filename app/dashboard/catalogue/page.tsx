@@ -62,20 +62,18 @@ export default function TestCatalogue() {
                 console.error('Error fetching products:', error);
                 setProducts([]);
             } else {
-                const productsWithImages = data.map((product: Product) => {
+                const productsWithImages = data.map((product: { id: number; name: string; description: string; price: number; stock_quantity: number; }) => {
                     let imageUrl = '';
                     switch (product.name) {
-                        case 'Milo':
-                            imageUrl = '/milo.jpg';
-                            break;
-                        case 'Chips':
-                            imageUrl = '/chips.jpg';
+                        case 'Milo Chips':
+                            imageUrl = '/images/milo-chips.jpg';
                             break;
                         case 'Apple Juice':
-                            imageUrl = '/applejuice.jpg';
+                            imageUrl = '/images/apple-juice.jpg';
                             break;
                         default:
-                            imageUrl = '/default.jpg';
+                            imageUrl = '/images/default.jpg';
+                            break;
                     }
                     return { ...product, image: imageUrl };
                 });
