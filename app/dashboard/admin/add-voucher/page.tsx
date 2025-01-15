@@ -60,26 +60,64 @@ export default function AddVoucher() {
         fetchVoucherBalance();
     }, [userId]);
 
-    async function updateVoucherBalance(e: React.FormEvent<HTMLFormElement>) {
+    async function checkUserExists(userId: string) {
+        const { data, error } = await client
+            .from('vouchers')
+            .select('balance')
+            .eq('user_id', userId)
+            .single();
+        return !error && data;
+    }
+
+    async function insertVoucher(userId: string, balance: number) {
+        try {
+            const { data, error } = await client
+                .from('vouchers')
+                .insert({ user_id: userId, balance: balance });
+            if (error) {
+                console.error('Insert Error:', error);
+                throw new Error('Error inserting new voucher balance');
+            }
+            console.log('Insert Success:', data);
+        } catch (err) {
+            setError(err.message);
+        }
+    }
+
+    async function updateVoucher(userId: string, balance: number) {
+        const { error } = await client
+            .from('vouchers')
+            .update({ balance })
+            .eq('user_id', userId);
+        if (error) {
+            throw new Error('Error updating voucher balance');
+        }
+    }
+
+    async function handleVoucherBalance(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        const { error } = await client
-            .from('vouchers')
-            .update({ balance: parseFloat(balance) })
-            .eq('user_id', userId);
-        if (error) {
-            setError('Error updating voucher balance');
-        } else {
+
+        try {
+            const userExists = await checkUserExists(userId);
+            if (userExists) {
+                await updateVoucher(userId, parseFloat(balance));
+            } else {
+                await insertVoucher(userId, parseFloat(balance));
+            }
             setCurrentBalance(parseFloat(balance));
+        } catch (err) {
+            setError(err.message);
         }
+
         setLoading(false);
     }
 
     return (
         <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <h1 style={{ textAlign: 'center', color: '#333' }}>Add Voucher</h1>
-            <form onSubmit={updateVoucherBalance} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <form onSubmit={handleVoucherBalance} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <div>
                     <label htmlFor="userId" style={{ fontWeight: 'bold', color: '#555' }}>User ID:</label>
                     <input
