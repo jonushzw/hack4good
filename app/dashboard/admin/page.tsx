@@ -1,3 +1,5 @@
+// In the AdminPage component
+import Link from 'next/link';
 import { createClerkClient } from '@clerk/nextjs/server';
 import { currentUser } from "@clerk/nextjs/server";
 import { createClerkSupabaseClientSsr } from "@/app/ssr/client";
@@ -11,7 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function AdminPage() {
     const user = await currentUser();
@@ -57,18 +59,25 @@ export default async function AdminPage() {
         return <p>Error fetching products.</p>;
     }
 
+    const productsWithDetails = products.map(product => ({
+        ...product,
+        status: product.status ? 'In Stock' : 'Out of Stock',
+    }));
+
     return (
-        <div>
-            <h1>Welcome, Admin</h1>
-            <p>This is the admin page. Here you can manage your application.</p>
+        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+            <h1 style={{ textAlign: 'center', color: '#333', fontSize: '2.5em', marginBottom: '10px' }}>Welcome, Admin</h1>
+            <p style={{ textAlign: 'center', color: '#666', fontSize: '1.2em', marginBottom: '30px' }}>
+                This is the admin page. Here you can manage your application, view users, and manage products.
+            </p>
             <Tabs>
                 <TabsList>
-                    <TabsTrigger value="users">Users</TabsTrigger>
-                    <TabsTrigger value="products">Products</TabsTrigger>
+                    <TabsTrigger value="users" style={{ padding: '15px 30px', fontSize: '18px' }}>Users</TabsTrigger>
+                    <TabsTrigger value="products" style={{ padding: '15px 30px', fontSize: '18px' }}>Products</TabsTrigger>
                 </TabsList>
                 <TabsContent value="users">
-                    <h2>Users List</h2>
-                    <p>Total Users: {totalCount}</p>
+                    <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Users List</h2>
+                    <p style={{fontSize: 18}}>Total Users: {totalCount}</p>
                     <Table>
                         <TableCaption>A list of all users.</TableCaption>
                         <TableHeader>
@@ -88,7 +97,7 @@ export default async function AdminPage() {
                                     <TableCell>{user.emailAddresses[0]?.emailAddress}</TableCell>
                                     <TableCell>{user.balance}</TableCell>
                                     <TableCell>
-                                        <a href={`/dashboard/admin/add-voucher?userId=${user.id}`}>Add Voucher</a>
+                                        <Link href={`/dashboard/admin/add-voucher?userId=${user.id}`}>Add Voucher</Link>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -102,26 +111,32 @@ export default async function AdminPage() {
                     </Table>
                 </TabsContent>
                 <TabsContent value="products">
-                    <h2>Products List</h2>
+                    <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Products List</h2>
                     <Table>
                         <TableCaption>A list of all products.</TableCaption>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>ID</TableHead>
                                 <TableHead>Name</TableHead>
+                                <TableHead>Price</TableHead>
                                 <TableHead>Stock Quantity</TableHead>
                                 <TableHead>Status</TableHead>
+                                <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {products.map((product) => (
+                            {productsWithDetails.map((product) => (
                                 <TableRow key={product.id}>
                                     <TableCell>{product.id}</TableCell>
                                     <TableCell>{product.name}</TableCell>
+                                    <TableCell>{product.price}</TableCell>
                                     <TableCell>{product.stock_quantity}</TableCell>
                                     <TableCell>{product.status}</TableCell>
+                                    <TableCell>
+                                        <Link href={`/dashboard/admin/change-stock-price?productId=${product.id}`}>Change Stock or Price</Link>
+                                    </TableCell>
                                 </TableRow>
-                            ))}
+                            )) as React.ReactNode}
                         </TableBody>
                     </Table>
                 </TabsContent>

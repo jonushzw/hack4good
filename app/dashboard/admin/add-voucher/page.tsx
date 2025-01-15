@@ -1,3 +1,4 @@
+// In the AddVoucher component
 'use client';
 import { useEffect, useState } from 'react';
 import { useSession } from '@clerk/nextjs';
@@ -10,6 +11,14 @@ export default function AddVoucher() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { session } = useSession();
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get('userId');
+        if (userId) {
+            setUserId(userId);
+        }
+    }, []);
 
     function createClerkSupabaseClient() {
         return createClient(
@@ -80,7 +89,11 @@ export default function AddVoucher() {
             }
             console.log('Insert Success:', data);
         } catch (err) {
-            setError(err.message);
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unknown error occurred');
+            }
         }
     }
 
@@ -108,7 +121,11 @@ export default function AddVoucher() {
             }
             setCurrentBalance(parseFloat(balance));
         } catch (err) {
-            setError(err.message);
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unknown error occurred');
+            }
         }
 
         setLoading(false);
@@ -126,7 +143,7 @@ export default function AddVoucher() {
                         value={userId}
                         onChange={(e) => setUserId(e.target.value)}
                         required
-                        style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px' }}
+                        style={{ padding: '15px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '18px' }}
                     />
                 </div>
                 <div>
@@ -137,10 +154,10 @@ export default function AddVoucher() {
                         value={balance}
                         onChange={(e) => setBalance(e.target.value)}
                         required
-                        style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px' }}
+                        style={{ padding: '15px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '18px' }}
                     />
                 </div>
-                <button type="submit" disabled={loading} style={{ padding: '10px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px', ...(loading && { backgroundColor: '#ccc' }) }}>Update Balance</button>
+                <button type="submit" disabled={loading} style={{ padding: '15px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '18px', ...(loading && { backgroundColor: '#ccc' }) }}>Update Balance</button>
             </form>
             {loading && <p style={{ textAlign: 'center', color: 'green' }}>Loading...</p>}
             {error && <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>}
