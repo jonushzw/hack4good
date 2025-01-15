@@ -57,7 +57,7 @@ const invoices = [
 ];
 
 export default function Profile() {
-  const vouchers = 5; // Replace with actual logic to fetch vouchers
+  const vouchers = 10; // Replace with actual logic to fetch vouchers
 
   return (
     <div style={styles.container}>
