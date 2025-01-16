@@ -1,3 +1,4 @@
+import { isMobile } from 'react-device-detect';
 import Link from 'next/link';
 import { createClerkClient } from '@clerk/nextjs/server';
 import { currentUser } from "@clerk/nextjs/server";
@@ -98,6 +99,155 @@ export default async function AdminPage() {
             userName: user ? user.id : 'Unknown User',
         };
     });
+
+    if (isMobile) {
+        return (
+            <div style={{ padding: '10px', fontFamily: 'Arial, sans-serif' }}>
+                <h1 style={{ textAlign: 'center', color: '#333', fontSize: '1.5em', marginBottom: '10px' }}>Welcome, Admin</h1>
+                <p style={{ textAlign: 'center', color: '#666', fontSize: '1em', marginBottom: '20px' }}>
+                    This is the admin page. Here you can manage your application, view users, and manage products.
+                </p>
+                <Tabs>
+                    <TabsList>
+                        <TabsTrigger value="users" style={{ padding: '10px 20px', fontSize: '14px' }}>Users</TabsTrigger>
+                        <TabsTrigger value="products" style={{ padding: '10px 20px', fontSize: '14px' }}>Products</TabsTrigger>
+                        <TabsTrigger value="tasks" style={{ padding: '10px 20px', fontSize: '14px' }}>Tasks</TabsTrigger>
+                        <TabsTrigger value="transactions" style={{ padding: '10px 20px', fontSize: '14px' }}>Transactions</TabsTrigger>
+                        <TabsTrigger value="preorders" style={{ padding: '10px 20px', fontSize: '14px' }}>Preorders</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="users">
+                        <h2 style={{ color: '#333', fontSize: '1.5em', marginBottom: '10px' }}>Users List</h2>
+                        <p style={{fontSize: 14}}>Total Users: {totalCount}</p>
+                        <Table>
+                            <TableCaption>A list of all users.</TableCaption>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Voucher Balance</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {usersWithBalance.map((user) => (
+                                    <TableRow key={user.id}>
+                                        <TableCell>{user.id}</TableCell>
+                                        <TableCell>{user.firstName ? `${user.firstName} ${user.lastName}` : 'External Account'}</TableCell>
+                                        <TableCell>{user.emailAddresses[0]?.emailAddress}</TableCell>
+                                        <TableCell>{user.balance}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TabsContent>
+                    <TabsContent value="products">
+                        <h2 style={{ color: '#333', fontSize: '1.5em', marginBottom: '10px' }}>Products List</h2>
+                        <Table>
+                            <TableCaption>A list of all products.</TableCaption>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Stock Quantity</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {productsWithDetails.map((product) => (
+                                    <TableRow key={product.id}>
+                                        <TableCell>{product.id}</TableCell>
+                                        <TableCell>{product.name}</TableCell>
+                                        <TableCell>{product.price}</TableCell>
+                                        <TableCell>{product.stock_quantity}</TableCell>
+                                        <TableCell>{product.status}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TabsContent>
+                    <TabsContent value="tasks">
+                        <h2 style={{ color: '#333', fontSize: '1.5em', marginBottom: '10px' }}>Tasks List</h2>
+                        <Table>
+                            <TableCaption>A list of all tasks.</TableCaption>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>User Name</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {tasksWithDetails.map((task) => (
+                                    <TableRow key={task.id}>
+                                        <TableCell>{task.id}</TableCell>
+                                        <TableCell>{task.name}</TableCell>
+                                        <TableCell>{task.userName}</TableCell>
+                                        <TableCell>{task.status}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TabsContent>
+                    <TabsContent value="transactions">
+                        <h2 style={{ color: '#333', fontSize: '1.5em', marginBottom: '10px' }}>Transactions List</h2>
+                        <Table>
+                            <TableCaption>A list of all transactions.</TableCaption>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>User ID</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Date</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {transactions.map((transaction) => (
+                                    <TableRow key={transaction.invoice_number}>
+                                        <TableCell>{transaction.invoice_number}</TableCell>
+                                        <TableCell>{transaction.user_id}</TableCell>
+                                        <TableCell>{transaction.status}</TableCell>
+                                        <TableCell>{transaction.item_name}</TableCell>
+                                        <TableCell>{transaction.time_purchased}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TabsContent>
+                    <TabsContent value="preorders">
+                        <h2 style={{ color: '#333', fontSize: '1.5em', marginBottom: '10px' }}>Preorders List</h2>
+                        <Table>
+                            <TableCaption>A list of all preorders.</TableCaption>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>User ID</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Item ID</TableHead>
+                                    <TableHead>Preorder Date</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {preordersWithDetails.map((preorder) => (
+                                    <TableRow key={preorder.id}>
+                                        <TableCell>{preorder.id}</TableCell>
+                                        <TableCell>{preorder.user_id}</TableCell>
+                                        <TableCell>{preorder.product_name}</TableCell>
+                                        <TableCell>{preorder.product_id}</TableCell>
+                                        <TableCell>{preorder.preorder_date}</TableCell>
+                                        <TableCell>{preorder.status}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TabsContent>
+                </Tabs>
+            </div>
+        );
+    }
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
