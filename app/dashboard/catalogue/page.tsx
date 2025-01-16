@@ -120,7 +120,9 @@ export default function TestCatalogue() {
             const newVoucherBalance = vouchers - selectedProduct.price;
 
             if (newVoucherBalance < 0) {
-                throw new Error('Insufficient vouchers');
+                setPopupVisible(false);
+                alert('You do not have enough vouchers');
+                return;
             }
 
             const { error: stockError } = await client
@@ -176,7 +178,7 @@ export default function TestCatalogue() {
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
                         <div style={styles.itemName}>{product.name}</div>
                         <div style={styles.itemDescription}>{product.description}</div>
-                        <div style={styles.itemPrice}>${product.price}</div>
+                        <div style={styles.itemPrice}>{product.price} Voucher(s)</div>
                         <div style={styles.itemStock}>In Stock: {product.stock_quantity}</div>
                         <button style={styles.buyButton} onClick={() => handleButtonClick(product)}>Buy</button>
                     </div>
@@ -192,7 +194,7 @@ export default function TestCatalogue() {
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
                         <div style={styles.itemName}>{product.name}</div>
                         <div style={styles.itemDescription}>{product.description}</div>
-                        <div style={styles.itemPrice}>${product.price}</div>
+                        <div style={styles.itemPrice}>{product.price} Voucher(s)</div>
                         <div style={styles.itemStock}>Out of Stock</div>
                         <button style={styles.preOrderButton} onClick={() => handleButtonClick(product)}>Pre-Order</button>
                     </div>

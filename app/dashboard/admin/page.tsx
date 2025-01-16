@@ -73,11 +73,17 @@ export default async function AdminPage() {
         const user = users.find(u => u.id === task.user_id);
         return {
             ...task,
-            userName: user ? user.firstName : 'Unknown User',
+            userName: user.id,
             status: task.status ? 'Completed' : 'Incomplete',
             showAddVoucher: !!task.status,
         };
     });
+
+    const { data: transactions, error: transactionsError } = await supabaseClient.from('transaction_history').select();
+    if (transactionsError) {
+        console.error('Error fetching transactions:', transactionsError);
+        return <p>Error fetching transactions.</p>;
+    }
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
@@ -90,6 +96,7 @@ export default async function AdminPage() {
                     <TabsTrigger value="users" style={{ padding: '15px 30px', fontSize: '18px' }}>Users</TabsTrigger>
                     <TabsTrigger value="products" style={{ padding: '15px 30px', fontSize: '18px' }}>Products</TabsTrigger>
                     <TabsTrigger value="tasks" style={{ padding: '15px 30px', fontSize: '18px' }}>Tasks</TabsTrigger>
+                    <TabsTrigger value="transactions" style={{ padding: '15px 30px', fontSize: '18px' }}>Transactions</TabsTrigger>
                 </TabsList>
                 <TabsContent value="users">
                     <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Users List</h2>
@@ -181,6 +188,33 @@ export default async function AdminPage() {
                                             <Link href={`/dashboard/admin/add-voucher?userId=${task.user_id}`}>Add Voucher</Link>
                                         ) : null}
                                     </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TabsContent>
+                <TabsContent value="transactions">
+                    <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Transactions List</h2>
+                    <Table>
+                        <TableCaption>A list of all transactions.</TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>User ID</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Date</TableHead>
+
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {transactions.map((transaction) => (
+                                <TableRow key={transaction.invoice_number}>
+                                    <TableCell>{transaction.invoice_number}</TableCell>
+                                    <TableCell>{transaction.user_id}</TableCell>
+                                    <TableCell>{transaction.status}</TableCell>
+                                    <TableCell>{transaction.item_name}</TableCell>
+                                    <TableCell>{transaction.time_purchased}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
