@@ -73,7 +73,7 @@ export default async function AdminPage() {
         const user = users.find(u => u.id === task.user_id);
         return {
             ...task,
-            userName: user.id,
+            userName: user ? user.id : 'Unknown User',
             status: task.status ? 'Completed' : 'Incomplete',
             showAddVoucher: !!task.status,
         };
