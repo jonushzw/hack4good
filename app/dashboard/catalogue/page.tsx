@@ -203,7 +203,7 @@ export default function TestCatalogue() {
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
                         <h2 style={styles.itemName}>{product.name}</h2>
                         <p style={styles.itemDescription}>{product.description}</p>
-                        <p style={styles.itemPrice}>${product.price}</p>
+                        <p style={styles.itemPrice}>{product.price} Voucher(s)</p>
                         <p style={{ ...styles.itemStock, color: getStockColor(product.stock_quantity) }}>
                             {product.stock_quantity > 0 ? `In Stock: ${product.stock_quantity}` : 'Out of Stock'}
                         </p>
@@ -226,7 +226,7 @@ export default function TestCatalogue() {
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
                         <h2 style={styles.itemName}>{product.name}</h2>
                         <p style={styles.itemDescription}>{product.description}</p>
-                        <p style={styles.itemPrice}>${product.price}</p>
+                        <p style={styles.itemPrice}>{product.price} Voucher(s)</p>
                         <p style={{ ...styles.itemStock, color: getStockColor(product.stock_quantity) }}>
                             {product.stock_quantity > 0 ? `In Stock: ${product.stock_quantity}` : 'Out of Stock'}
                         </p>
@@ -380,5 +380,6 @@ const styles: { [key: string]: CSSProperties } = {
         display: 'flex',
         justifyContent: 'space-between',
         marginTop: '10px',
+        gap: '10px', // Add gap between buttons
     },
 };

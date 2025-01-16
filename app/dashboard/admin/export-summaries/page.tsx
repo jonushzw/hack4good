@@ -3,9 +3,18 @@
 import { writeFile, utils } from 'xlsx';
 import { createClient } from '@supabase/supabase-js';
 import { useUser } from "@clerk/clerk-react";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-async function fetchData() {
+type Data = {
+    users: any[] | null;
+    vouchers: any[] | null;
+    products: any[] | null;
+    tasks: any[] | null;
+    transactions: any[] | null;
+    preorders: any[] | null;
+};
+
+async function fetchData(): Promise<Data> {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_KEY) {
         throw new Error("Supabase environment variables are not defined");
     }
@@ -36,7 +45,7 @@ async function fetchData() {
 
 export default function ExportSummariesPage() {
     const { isSignedIn, user, isLoaded } = useUser();
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<Data | null>(null);
     const [loading, setLoading] = useState(false);
 
     const isAdmin = isSignedIn && user?.publicMetadata.role === 'admin';
