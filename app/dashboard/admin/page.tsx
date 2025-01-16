@@ -101,7 +101,14 @@ export default async function AdminPage() {
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1 style={{ textAlign: 'center', color: '#333', fontSize: '2.5em', marginBottom: '10px' }}>Welcome, Admin</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h1 style={{ textAlign: 'center', color: '#333', fontSize: '2.5em', marginBottom: '10px' }}>Welcome, Admin</h1>
+                <Link href="/dashboard/admin/export-summaries">
+                    <button style={{ padding: '10px 20px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px', transition: 'background-color 0.3s' }}>
+                        Export Summaries
+                    </button>
+                </Link>
+            </div>
             <p style={{ textAlign: 'center', color: '#666', fontSize: '1.2em', marginBottom: '30px' }}>
                 This is the admin page. Here you can manage your application, view users, and manage products.
             </p>

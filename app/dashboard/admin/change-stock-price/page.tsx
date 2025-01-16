@@ -1,9 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSession } from '@clerk/nextjs';
 import { createClient } from '@supabase/supabase-js';
+import { useUser } from "@clerk/clerk-react";
 
 export default function ChangeStockPrice() {
+    const { isSignedIn, user, isLoaded } = useUser();
     const [productId, setProductId] = useState('');
     const [stock, setStock] = useState('');
     const [price, setPrice] = useState('');
@@ -12,6 +14,16 @@ export default function ChangeStockPrice() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { session } = useSession();
+
+    const isAdmin = isSignedIn && user?.publicMetadata.role === 'admin';
+
+    if (!isLoaded) {
+        return <p>Loading...</p>;
+    }
+
+    if (!isAdmin) {
+        return <p>You have no access to this page.</p>;
+    }
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);

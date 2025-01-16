@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useSession } from '@clerk/nextjs';
+import { useUser } from "@clerk/clerk-react";
 
 export default function ApprovePreorder() {
+    const { isSignedIn, user, isLoaded } = useUser();
     const [preorderId, setPreorderId] = useState('');
     const [userId, setUserId] = useState('');
     const [status, setStatus] = useState('pending');
@@ -11,6 +13,16 @@ export default function ApprovePreorder() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { session } = useSession();
+
+    const isAdmin = isSignedIn && user?.publicMetadata.role === 'admin';
+
+    if (!isLoaded) {
+        return <p>Loading...</p>;
+    }
+
+    if (!isAdmin) {
+        return <p>You have no access to this page.</p>;
+    }
 
     function createClerkSupabaseClient() {
         return createClient(
