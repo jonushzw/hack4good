@@ -63,6 +63,22 @@ export default async function AdminPage() {
         status: product.status ? 'In Stock' : 'Out of Stock',
     }));
 
+    const { data: tasks, error: tasksError } = await supabaseClient.from('tasks').select();
+    if (tasksError) {
+        console.error('Error fetching tasks:', tasksError);
+        return <p>Error fetching tasks.</p>;
+    }
+
+    const tasksWithDetails = tasks.map(task => {
+        const user = users.find(u => u.id === task.user_id);
+        return {
+            ...task,
+            userName: user ? user.firstName : 'Unknown User',
+            status: task.status ? 'Completed' : 'Incomplete',
+            showAddVoucher: !!task.status,
+        };
+    });
+
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1 style={{ textAlign: 'center', color: '#333', fontSize: '2.5em', marginBottom: '10px' }}>Welcome, Admin</h1>
@@ -73,6 +89,7 @@ export default async function AdminPage() {
                 <TabsList>
                     <TabsTrigger value="users" style={{ padding: '15px 30px', fontSize: '18px' }}>Users</TabsTrigger>
                     <TabsTrigger value="products" style={{ padding: '15px 30px', fontSize: '18px' }}>Products</TabsTrigger>
+                    <TabsTrigger value="tasks" style={{ padding: '15px 30px', fontSize: '18px' }}>Tasks</TabsTrigger>
                 </TabsList>
                 <TabsContent value="users">
                     <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Users List</h2>
@@ -136,6 +153,36 @@ export default async function AdminPage() {
                                     </TableCell>
                                 </TableRow>
                             )) as React.ReactNode}
+                        </TableBody>
+                    </Table>
+                </TabsContent>
+                <TabsContent value="tasks">
+                    <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Tasks List</h2>
+                    <Table>
+                        <TableCaption>A list of all tasks.</TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>User Name</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {tasksWithDetails.map((task) => (
+                                <TableRow key={task.id}>
+                                    <TableCell>{task.id}</TableCell>
+                                    <TableCell>{task.name}</TableCell>
+                                    <TableCell>{task.userName}</TableCell>
+                                    <TableCell>{task.status}</TableCell>
+                                    <TableCell>
+                                        {task.showAddVoucher ? (
+                                            <Link href={`/dashboard/admin/add-voucher?userId=${task.user_id}`}>Add Voucher</Link>
+                                        ) : null}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                         </TableBody>
                     </Table>
                 </TabsContent>

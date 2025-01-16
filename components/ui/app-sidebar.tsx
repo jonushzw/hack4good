@@ -28,15 +28,16 @@ const items = [
         icon: Inbox,
     },
     {
-        title: "Catalogue",
-        url: "/dashboard/catalogue",
-        icon: Search,
-    },
-    {
         title: "Tasks",
         url: "/dashboard/tasks",
         icon: Calendar,
     },
+    {
+        title: "Catalogue",
+        url: "/dashboard/catalogue",
+        icon: Search,
+    },
+
 ];
 
 export function AppSidebar() {
