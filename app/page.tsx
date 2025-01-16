@@ -23,7 +23,7 @@ export default async function Page() {
           <div style={styles.headerOverlay}></div> 
           <h1 style={styles.title}>
           <strong>Muhammadiyah Welfare Home</strong> <br />
-            Online Shop</h1>
+            Minimart</h1>
           <p style={styles.description}>
             Sign in below to view shop
           </p>
