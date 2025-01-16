@@ -65,9 +65,9 @@ npx shadcn@latest add sidebar
    3. View and manage transaction history and user balances.
    4. Export information to an Excel file for easy record-keeping.
 
-## Software Development Process
+## Problem Statement
 
-### Initial Planning/Development Scope
+### How We Addressed the Problem to streamline the minimart operations and improve the overall user experience
 1. **Requirement Gathering**:
     1. Identify the core features required for the web minimart application.
     2. Define user roles and their respective functionalities (e.g., Residents, Admins).
