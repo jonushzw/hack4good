@@ -109,11 +109,11 @@ export default async function AdminPage() {
                 </p>
                 <Tabs>
                     <TabsList>
-                        <TabsTrigger value="users" style={{ padding: '10px 20px', fontSize: '14px' }}>Users</TabsTrigger>
-                        <TabsTrigger value="products" style={{ padding: '10px 20px', fontSize: '14px' }}>Products</TabsTrigger>
-                        <TabsTrigger value="tasks" style={{ padding: '10px 20px', fontSize: '14px' }}>Tasks</TabsTrigger>
-                        <TabsTrigger value="transactions" style={{ padding: '10px 20px', fontSize: '14px' }}>Transactions</TabsTrigger>
-                        <TabsTrigger value="preorders" style={{ padding: '10px 20px', fontSize: '14px' }}>Preorders</TabsTrigger>
+                        <TabsTrigger value="users" style={{ padding: '5px 10px', fontSize: '7px' }}>Users</TabsTrigger>
+                        <TabsTrigger value="products" style={{ padding: '5px 10px', fontSize: '7px' }}>Products</TabsTrigger>
+                        <TabsTrigger value="tasks" style={{ padding: '5px 10px', fontSize: '7px' }}>Tasks</TabsTrigger>
+                        <TabsTrigger value="transactions" style={{ padding: '5px 10px', fontSize: '7px' }}>Transactions</TabsTrigger>
+                        <TabsTrigger value="preorders" style={{ padding: '5px 10px', fontSize: '7px' }}>Preorders</TabsTrigger>
                     </TabsList>
                     <TabsContent value="users">
                         <h2 style={{ color: '#333', fontSize: '1.5em', marginBottom: '10px' }}>Users List</h2>
