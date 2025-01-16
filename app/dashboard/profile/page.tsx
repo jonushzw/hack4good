@@ -61,7 +61,7 @@ const invoices = [
 ];
 
 export default function Profile() {
-  const [vouchers, setVouchers] = useState<number | null>(null);
+  const [balance, setBalance] = useState<number | null>(null); // Define balance and setBalance
   const { user } = useUser();
   const { session } = useSession();
 
@@ -98,13 +98,12 @@ export default function Profile() {
       const { data, error } = await client
           .from('vouchers')
           .select('balance')
-          .eq('user_id', user.id)
+          .eq('user_id', user?.id) // Use optional chaining
           .single();
       if (error) {
         console.error('Error fetching vouchers:', error);
-        setVouchers(null);
       } else {
-        setVouchers(data.balance);
+        setBalance(data?.balance || 0);
       }
     }
 
@@ -120,7 +119,7 @@ export default function Profile() {
         </header>
         <div style={styles.voucherBox}>
           <FaTicketAlt style={styles.icon} />
-          <span style={styles.voucherText}>Vouchers Available: {vouchers !== null ? vouchers : 'Loading...'}</span>
+          <span style={styles.voucherText}>Vouchers Available: {balance !== null ? balance : 'Loading...'}</span>
         </div>
         <div style={styles.tableContainer}>
           <h2 style={styles.transactionHistoryText}>Your Transaction History</h2>

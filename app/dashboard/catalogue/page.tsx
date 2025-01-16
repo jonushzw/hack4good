@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSession, useUser } from '@clerk/nextjs';
 import { createClient } from '@supabase/supabase-js';
 import { CSSProperties } from "react";
+import {FaTicketAlt} from "react-icons/fa";
 
 interface Product {
     id: number;
@@ -153,6 +154,7 @@ export default function TestCatalogue() {
     return (
         <div style={styles.catalog}>
             <div style={styles.voucherBox}>
+                <FaTicketAlt style={styles.icon} />
                 <span style={styles.voucherText}>Vouchers Available: {vouchers !== null ? vouchers : 'Loading...'}</span>
             </div>
             <h1 style={styles.section}>Available Products</h1>
