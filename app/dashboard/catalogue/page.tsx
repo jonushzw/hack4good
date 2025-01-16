@@ -1,75 +1,184 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSession, useUser } from '@clerk/nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { CSSProperties } from "react";
+import {FaTicketAlt} from "react-icons/fa";
 
-interface Item {
+interface Product {
     id: number;
     name: string;
+    description: string;
+    price: number;
+    stock_quantity: number;
     image: string;
-    qty: number;
 }
 
-const initialItems: Item[] = [
-    { id: 1, name: 'Milo', image: '/milo.jpg', qty: 0 },
-    { id: 2, name: 'Chips', image: '/chips.jpg', qty: 4 },
-    { id: 3, name: 'Apple Juice', image: '/applejuice.jpg', qty: 2 },
-    // Add more items as needed
-];
-
-export default function Catalog() {
-    const [items, setItems] = useState<Item[]>(initialItems);
+export default function TestCatalogue() {
+    const [products, setProducts] = useState<Product[]>([]);
     const [popupVisible, setPopupVisible] = useState(false);
-    const [confirmationPopupVisible, setConfirmationPopupVisible] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-    const [voucherNumber, setVoucherNumber] = useState(10);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [vouchers, setVouchers] = useState<number | null>(null);
+    const { user } = useUser();
+    const { session } = useSession();
+
+    function createClerkSupabaseClient() {
+        return createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_KEY!,
+            {
+                global: {
+                    fetch: async (url, options: RequestInit = {}) => {
+                        const clerkToken = await session?.getToken({
+                            template: 'supabase',
+                        });
+
+                        const headers = new Headers(options.headers);
+                        headers.set('Authorization', `Bearer ${clerkToken}`);
+
+                        return fetch(url, {
+                            ...options,
+                            headers: headers as HeadersInit,
+                        });
+                    },
+                },
+            },
+        );
+    }
+
+    const client = createClerkSupabaseClient();
 
     useEffect(() => {
-        // Ensure the state is consistent between server and client
-        setItems(initialItems);
-    }, []);
+        if (!user) return;
 
-    const availableProducts = items.filter(item => item.qty > 0);
-    const preOrderProducts = items.filter(item => item.qty <= 0);
+        async function loadProducts() {
+            const { data, error } = await client
+                .from('products')
+                .select('id, name, description, price, stock_quantity');
+            if (error) {
+                console.error('Error fetching products:', error);
+                setProducts([]);
+            } else {
+                const productsWithImages = data.map((product: { id: number; name: string; description: string; price: number; stock_quantity: number; }) => {
+                    let imageUrl = '';
+                    switch (product.name) {
+                        case 'Milo':
+                            imageUrl = '/milo.jpg';
+                            break;
+                        case 'Chips':
+                            imageUrl = '/chips.jpg';
+                            break;
+                        case 'Apple Juice':
+                            imageUrl = '/applejuice.jpg';
+                            break;
+                        default:
+                            imageUrl = '/default.jpg';
+                    }
+                    return { ...product, image: imageUrl };
+                });
+                setProducts(productsWithImages);
+            }
+        }
 
-    const handleButtonClick = (item: Item) => {
-        setSelectedItem(item);
+        async function loadVoucherBalance() {
+            if (!user) return;
+            const { data, error } = await client
+                .from('vouchers')
+                .select('balance')
+                .eq('user_id', user.id)
+                .single();
+            if (error) {
+                console.error('Error fetching vouchers:', error);
+                setVouchers(null);
+            } else {
+                setVouchers(data.balance);
+            }
+        }
+
+        loadProducts();
+        loadVoucherBalance();
+    }, [user]);
+
+    const availableProducts = products.filter(product => product.stock_quantity > 0);
+    const preOrderProducts = products.filter(product => product.stock_quantity <= 0);
+
+    const handleButtonClick = (product: Product) => {
+        setSelectedProduct(product);
         setPopupVisible(true);
     };
 
     const closePopup = () => {
         setPopupVisible(false);
-        setSelectedItem(null);
+        setSelectedProduct(null);
     };
 
-    const closeConfirmationPopup = () => {
-        setConfirmationPopupVisible(false);
-    };
+    const handlePurchase = async () => {
+        if (!selectedProduct || vouchers === null || !user) return;
 
-    const confirmPurchase = () => {
-        if (voucherNumber > 0) {
-            setVoucherNumber(voucherNumber - 1);
-            const updatedItems = items.map(item =>
-                item.id === selectedItem?.id ? { ...item, qty: item.qty - 1 } : item
-            );
-            setItems(updatedItems);
-            setPopupVisible(false);
-            setConfirmationPopupVisible(true);
-        } else {
-            alert('No vouchers left!');
+        try {
+            const newStockQuantity = selectedProduct.stock_quantity - 1;
+            const newVoucherBalance = vouchers - selectedProduct.price;
+
+            if (newVoucherBalance < 0) {
+                throw new Error('Insufficient vouchers');
+            }
+
+            const { error: stockError } = await client
+                .from('products')
+                .update({ stock_quantity: newStockQuantity })
+                .eq('id', selectedProduct.id);
+            if (stockError) {
+                throw new Error('Error updating stock quantity');
+            }
+
+            const { error: voucherError } = await client
+                .from('vouchers')
+                .update({ balance: newVoucherBalance })
+                .eq('user_id', user.id);
+            if (voucherError) {
+                throw new Error('Error updating voucher balance');
+            }
+
+            const { error: transactionError } = await client
+                .from('transaction_history')
+                .insert({
+                    user_id: user.id,
+                    status: selectedProduct.stock_quantity > 0 ? 'Purchased' : 'Preorder',
+                    item_name: selectedProduct.name,
+                    vouchers_used: selectedProduct.price,
+                });
+            if (transactionError) {
+                throw new Error('Error inserting transaction history');
+            }
+
+            setProducts(products.map(product =>
+                product.id === selectedProduct.id
+                    ? { ...product, stock_quantity: newStockQuantity }
+                    : product
+            ));
+            setVouchers(newVoucherBalance);
+            closePopup();
+        } catch (err) {
+            console.error(err);
         }
-        closePopup();
     };
 
     return (
         <div style={styles.catalog}>
+            <div style={styles.voucherBox}>
+                <FaTicketAlt style={styles.icon} />
+                <span style={styles.voucherText}>Vouchers Available: {vouchers !== null ? vouchers : 'Loading...'}</span>
+            </div>
             <h1 style={styles.section}>Available Products</h1>
             <div style={styles.itemsGrid}>
-                {availableProducts.map(item => (
-                    <div key={item.id} style={styles.itemCard}>
-                        <img src={item.image} alt={item.name} style={styles.itemImage} />
-                        <h2>{item.name}</h2>
-                        <p>Qty: {item.qty}</p>
-                        <button style={styles.buyButton} onClick={() => handleButtonClick(item)}>Buy Now</button>
+                {availableProducts.map(product => (
+                    <div key={product.id} style={styles.itemCard}>
+                        <img src={product.image} alt={product.name} style={styles.itemImage} />
+                        <div style={styles.itemName}>{product.name}</div>
+                        <div style={styles.itemDescription}>{product.description}</div>
+                        <div style={styles.itemPrice}>${product.price}</div>
+                        <div style={styles.itemStock}>In Stock: {product.stock_quantity}</div>
+                        <button style={styles.buyButton} onClick={() => handleButtonClick(product)}>Buy</button>
                     </div>
                 ))}
             </div>
@@ -78,11 +187,14 @@ export default function Catalog() {
 
             <h1 style={styles.section}>Pre-Order</h1>
             <div style={styles.itemsGrid}>
-                {preOrderProducts.map(item => (
-                    <div key={item.id} style={styles.itemCard}>
-                        <img src={item.image} alt={item.name} style={styles.itemImage} />
-                        <h2>{item.name}</h2>
-                        <button style={styles.preOrderButton} onClick={() => handleButtonClick(item)}>Pre-Order Now</button>
+                {preOrderProducts.map(product => (
+                    <div key={product.id} style={styles.itemCard}>
+                        <img src={product.image} alt={product.name} style={styles.itemImage} />
+                        <div style={styles.itemName}>{product.name}</div>
+                        <div style={styles.itemDescription}>{product.description}</div>
+                        <div style={styles.itemPrice}>${product.price}</div>
+                        <div style={styles.itemStock}>Out of Stock</div>
+                        <button style={styles.preOrderButton} onClick={() => handleButtonClick(product)}>Pre-Order</button>
                     </div>
                 ))}
             </div>
@@ -90,25 +202,11 @@ export default function Catalog() {
             {popupVisible && (
                 <div style={styles.popupOverlay}>
                     <div style={styles.popup}>
-                        <h2>{selectedItem?.name ?? ''}</h2>
-                        <img src={selectedItem?.image ?? ''} alt={selectedItem?.name ?? ''} style={styles.itemImage}/>
-                        <p>Are you sure you want
-                            to {selectedItem?.qty !== undefined && selectedItem.qty > 0 ? 'buy' : 'pre-order'} this
-                            item?</p>
-                        <div style={styles.buttonContainer}>
-                            <button onClick={confirmPurchase} style={styles.confirmButton}>Confirm</button>
-                            <button onClick={closePopup} style={styles.closeButton}>Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {confirmationPopupVisible && (
-                <div style={styles.popupOverlay}>
-                    <div style={styles.popup}>
-                        <h2>Purchase Confirmed!</h2>
-                        <p>Your remaining vouchers: {voucherNumber}</p>
-                        <button onClick={closeConfirmationPopup} style={styles.closeButton}>Close</button>
+                        <h2>{selectedProduct?.name}</h2>
+                        <p>{selectedProduct?.description}</p>
+                        <p>Price: ${selectedProduct?.price}</p>
+                        <button style={styles.closeButton} onClick={closePopup}>Close</button>
+                        <button style={styles.buyButton} onClick={handlePurchase}>Purchase</button>
                     </div>
                 </div>
             )}
@@ -120,10 +218,24 @@ const styles: { [key: string]: CSSProperties } = {
     catalog: {
         padding: '20px',
     },
+    voucherBox: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '20px',
+        padding: '10px',
+        border: '1px solid #ccc',
+        borderRadius: '5px',
+        textAlign: 'center',
+    },
+    voucherText: {
+        fontSize: '20px',
+    },
     section: {
         fontSize: '24px',
         fontWeight: 'bold',
         marginBottom: '20px',
+        textAlign: 'center',
     },
     itemsGrid: {
         display: 'grid',
@@ -135,34 +247,62 @@ const styles: { [key: string]: CSSProperties } = {
         borderRadius: '8px',
         padding: '10px',
         textAlign: 'center',
-        height: '300px',
+        height: '450px',
         display: 'flex',
         flexDirection: 'column' as 'column', // Ensure type compatibility
         justifyContent: 'space-between',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s',
+    },
+    itemCardHover: {
+        transform: 'scale(1.05)',
     },
     itemImage: {
         width: '100%',
         height: 'auto',
-        maxHeight: '150px',
+        maxHeight: '200px',
         objectFit: 'contain',
+        marginBottom: '10px',
+    },
+    itemName: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        margin: '10px 0',
+    },
+    itemDescription: {
+        fontSize: '16px',
+        color: '#555',
+        marginBottom: '10px',
+    },
+    itemPrice: {
+        fontSize: '18px',
+        fontWeight: 'bold',
+        color: '#007bff',
+        marginBottom: '10px',
+    },
+    itemStock: {
+        fontSize: '16px',
+        color: '#28a745',
     },
     buyButton: {
-        marginTop: '10px',
+        marginTop: 'auto',
         padding: '10px 20px',
         backgroundColor: '#007bff',
         color: '#fff',
         border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
+        alignSelf: 'center',
     },
     preOrderButton: {
-        marginTop: '10px',
+        marginTop: 'auto',
         padding: '10px 20px',
         backgroundColor: '#ff9800',
         color: '#fff',
         border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
+        alignSelf: 'center',
     },
     spacer: {
         height: '50px',
@@ -189,15 +329,6 @@ const styles: { [key: string]: CSSProperties } = {
         marginTop: '10px',
         padding: '10px 20px',
         backgroundColor: '#007bff',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-    },
-    confirmButton: {
-        marginTop: '10px',
-        padding: '10px 20px',
-        backgroundColor: '#28a745',
         color: '#fff',
         border: 'none',
         borderRadius: '4px',

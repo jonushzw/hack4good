@@ -2,12 +2,11 @@
 import { useEffect, useState } from 'react';
 import { useSession, useUser } from '@clerk/nextjs';
 import { createClient } from '@supabase/supabase-js';
-import UserMetadata from "@/components/userMetadata";
+import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
 export default function Home() {
     const [tasks, setTasks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [name, setName] = useState('');
     const { user } = useUser();
     const { session } = useSession();
 
@@ -43,7 +42,6 @@ export default function Home() {
         async function loadTasks() {
             setLoading(true);
             if (user) {
-                console.log('User ID:', user.id); // Log user ID
                 const { data, error } = await client
                     .from('tasks')
                     .select()
@@ -56,51 +54,20 @@ export default function Home() {
         loadTasks();
     }, [user]);
 
-    async function createTask(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    async function updateTaskStatus(taskId: string, currentStatus: boolean) {
         if (!user) return;
-        console.log('User ID:', user.id); // Log user ID
-        const { data, error } = await client.from('tasks').insert({
-            name,
-            user_id: user.id,
-        });
+        const newStatus = !currentStatus;
+        const { data, error } = await client
+            .from('tasks')
+            .update({ status: newStatus })
+            .eq('id', taskId)
+            .eq('user_id', user.id);
         if (error) {
-            console.error('Error inserting task:', error);
+            console.error('Error updating task status:', error);
         } else {
-            console.log('Task inserted:', data);
-            window.location.reload();
+            setTasks(tasks.map(task => task.id === taskId ? { ...task, status: newStatus } : task));
         }
     }
-
-    async function deleteTask(taskName: string) {
-        if (!user) {
-            console.error('User is not authenticated');
-            return;
-        }
-
-        console.log('Attempting to delete task:', taskName);
-        try {
-            const { data, error } = await client
-                .from('tasks')
-                .delete()
-                .eq('name', taskName)
-                .eq('user_id', user.id)
-                .select(); // Ensure the response includes the deleted data
-
-            if (error) {
-                console.error('Error deleting task:', error.message);
-            } else if (!data || data.length === 0) {
-                console.log('No task found with the specified name.');
-            } else {
-                console.log('Task deleted:', data);
-                // Optionally update the local state.
-                setTasks((prevTasks) => prevTasks.filter((task) => task.name !== taskName));
-            }
-        } catch (err) {
-            console.error('Unexpected error:', err);
-        }
-    }
-
 
     return (
         <div>
@@ -108,27 +75,39 @@ export default function Home() {
 
             {loading && <p>Loading...</p>}
 
-            {!loading && tasks.length > 0 && tasks.map((task: any) => (
-                <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <p>{task.name}</p>
-                    <button onClick={() => deleteTask(task.name)}>Delete</button>
-                </div>
-            ))}
+            {!loading && tasks.length > 0 && (
+                <Table>
+                    <TableCaption>A list of all tasks.</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Task ID</TableHead>
+                            <TableHead>Task Name</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Action</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {tasks.length > 0 ? (
+                            <>
+                                {tasks.map((task: any) => (
+                                    <TableRow key={task.id}>
+                                        <TableCell>{task.id}</TableCell>
+                                        <TableCell>{task.name}</TableCell>
+                                        <TableCell>{task.status ? 'Completed' : 'Incomplete'}</TableCell>
+                                        <TableCell>
+                                            <button onClick={() => updateTaskStatus(task.id, task.status)}>
+                                                {task.status ? 'Mark as Incomplete' : 'Mark as Complete'}
+                                            </button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
+                        ) : null}
+                    </TableBody>
+                </Table>
+            )}
 
             {!loading && tasks.length === 0 && <p>No tasks found</p>}
-
-            <form onSubmit={createTask}>
-                <input
-                    autoFocus
-                    type="text"
-                    name="name"
-                    placeholder="Enter new task"
-                    onChange={(e) => setName(e.target.value)}
-                    value={name}
-                />
-                <button type="submit">Add</button>
-            </form>
-            <UserMetadata />
         </div>
     );
 }
