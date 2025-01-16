@@ -15,53 +15,9 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Purchased",
-    itemName: "Item A",
-    vouchersUsed: 2,
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Preordered",
-    itemName: "Item B",
-    vouchersUsed: 1,
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Purchased",
-    itemName: "Item C",
-    vouchersUsed: 3,
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Purchased",
-    itemName: "Item D",
-    vouchersUsed: 4,
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Preordered",
-    itemName: "Item E",
-    vouchersUsed: 2,
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Purchased",
-    itemName: "Item F",
-    vouchersUsed: 1,
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Purchased",
-    itemName: "Item G",
-    vouchersUsed: 3,
-  },
-];
-
 export default function Profile() {
-  const [balance, setBalance] = useState<number | null>(null); // Define balance and setBalance
+  const [balance, setBalance] = useState<number | null>(null);
+  const [transactionHistory, setTransactionHistory] = useState<any[]>([]);
   const { user } = useUser();
   const { session } = useSession();
 
@@ -98,7 +54,7 @@ export default function Profile() {
       const { data, error } = await client
           .from('vouchers')
           .select('balance')
-          .eq('user_id', user?.id) // Use optional chaining
+          .eq('user_id', user?.id)
           .single();
       if (error) {
         console.error('Error fetching vouchers:', error);
@@ -107,10 +63,24 @@ export default function Profile() {
       }
     }
 
+    async function loadTransactionHistory() {
+      const { data, error } = await client
+          .from('transaction_history')
+          .select('invoice_number, status, item_name, vouchers_used')
+          .eq('user_id', user?.id)
+          .order('time_purchased', { ascending: false });
+      if (error) {
+        console.error('Error fetching transaction history:', error);
+      } else {
+        setTransactionHistory(data || []);
+      }
+    }
+
     loadVoucherBalance();
+    loadTransactionHistory();
   }, [user]);
 
-  const totalVouchersUsed = invoices.reduce((total, invoice) => total + invoice.vouchersUsed, 0);
+  const totalVouchersUsed = transactionHistory.reduce((total, transaction) => total + transaction.vouchers_used, 0);
 
   return (
       <div style={styles.container}>
@@ -133,12 +103,12 @@ export default function Profile() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.map((invoice) => (
-                  <TableRow key={invoice.invoice}>
-                    <TableCell className="font-medium">{invoice.invoice}</TableCell>
-                    <TableCell>{invoice.paymentStatus}</TableCell>
-                    <TableCell>{invoice.itemName}</TableCell>
-                    <TableCell className="text-right">{invoice.vouchersUsed}</TableCell>
+              {transactionHistory.map((transaction) => (
+                  <TableRow key={transaction.invoice_number}>
+                    <TableCell className="font-medium">{transaction.invoice_number}</TableCell>
+                    <TableCell>{transaction.status}</TableCell>
+                    <TableCell>{transaction.item_name}</TableCell>
+                    <TableCell className="text-right">{transaction.vouchers_used}</TableCell>
                   </TableRow>
               ))}
             </TableBody>

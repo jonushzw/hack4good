@@ -139,6 +139,18 @@ export default function TestCatalogue() {
                 throw new Error('Error updating voucher balance');
             }
 
+            const { error: transactionError } = await client
+                .from('transaction_history')
+                .insert({
+                    user_id: user.id,
+                    status: selectedProduct.stock_quantity > 0 ? 'Purchased' : 'Preorder',
+                    item_name: selectedProduct.name,
+                    vouchers_used: selectedProduct.price,
+                });
+            if (transactionError) {
+                throw new Error('Error inserting transaction history');
+            }
+
             setProducts(products.map(product =>
                 product.id === selectedProduct.id
                     ? { ...product, stock_quantity: newStockQuantity }
