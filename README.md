@@ -3,43 +3,11 @@
 
 Link to deployment: https://hack4good-khaki.vercel.app/
 
-**Project Scope and Aim:** We aim to create a web application.
-
-This application will not only connect people through sports but also facilitate finding sports buddies to play with. Ultimately, finding like-minded individuals with the same sporting intentions is our key aim.
-
-We look to match people by sporting type through our application and facilitate the coordination of sports meetups with our matched individuals.
-
-**Motivation:** Driven by our passion for sports, we have encountered a common challenge: finding fellow enthusiasts who share our precise sporting passions.
-
-In acknowledging the diverse sports preferences within our social circles, we identified a gap—connecting with individuals eager to engage in the same sport.
-
-Some sports thrive with multiple participants, amplifying the fun, productivity, and effectiveness of the experience. Additionally, considering the fact that different people have varying skill, many seek to engage with opponents or teammates of similar proficiency for a balanced and enjoyable experience.
-
-Inspired by our individual struggles to find sporting buddies, this realisation sparked our mission to create a solution that seamlessly connects like-minded individuals, fostering enjoyable and fulfilling sporting experiences.
-
-**User Stories:**
-
-As a user who wants to find compatible players to engage in new sports with, I want to be able to search and filter for potential players based on a specified criteria such as my sport of interest, the proficiency of the other players, and many more criteria. Therefore, this will allow me to find the best possible match that I will be satisfied to play with.
-
-As a prospective user who wishes to create a comprehensive and tailored profile within the system, I want to be able to access a user login and authentication system that allows me to create and maintain a personalized profile, ensuring an accurate representation of my athletic abilities and preferences, while also obscuring my personal details.
-
-As individuals who have been matched and desire to know more about different amenities that are in the surroundings of a particular sporting facility, I want to be able to search for a sporting facility in the web application and I want to be able to see the various categories of nearby amenities such as food, parking, and many more. I also want the web application to be able to display the names and addresses of these places upon clicking on them.
-
-As a user who has been successfully matched with potential sporting partners, who wants to establish a rapport and coordinate logistics prior to meeting in person, I want to be able to chat, interact and communicate with my sporting partner without having to exchange any personal details.
-
-## Features
-
-User Matching Feature (core): Our web application allows users to create and submit requests for different sports. Users can specify their sport of interest, preferred location, date and time of the activity that they wish to engage in. If the user is not able to make it for their booking, they can cancel their active request. Users can then view these requests and filter them out based on the sport or the location. By considering such factors, users can send requests to one another, view their sent requests and accept or decline any incoming requests. Should a user accept a request, the booking will reflect on their main dashboard page together with the sport, location, date, time and partner that they will be playing with. Users can mark confirmed matches as complete once they have carried out the activity.
-
-Personalised User Profiles and Authentication System (core): The web application offers a secure user authentication system for creating customized profiles. Users can showcase their current sports engagements, proficiency in various activities, and more, providing a comprehensive overview of their sporting interests and abilities.
-
-Proximity-Based Amenities Finder (core): Leveraging geolocation data, the platform identifies nearby amenities suitable for users. By providing a range of options to choose from such as Transportation, Food and many more, MatchFixing makes it as convenient as possible for users as they do not have to navigate out of the web application to locate nearby amenities. Users can view the names and also the addresses of the different places as well.
-
-Direct Messaging System (extension): Users can engage in communication through a dedicated chat interface, allowing matched individuals to interact online before meeting in person. This feature enhances user experience by facilitating pre-meetup discussions and planning. Similar to a forum and its reply system, we implement a chat feature which allows users to plan their meeting before the actual match.
-
 ## Scope Of Project
 
-The web application provides a straightforward user interface for users to select their respective sports and match based on certain criteria
+1. The web application provides a straightforward minimart system for residents to manage their voucher balances, request products, and view transaction history. 
+2. The system also includes an admin interface for managing users, approving product requests, and exporting transaction data.
+3. Built for Muhammadiyah Welfare Home, the application aims to streamline the minimart operations and improve the overall user experience for residents and administrators.
 
 ## Tech Stack
 
