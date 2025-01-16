@@ -1,6 +1,12 @@
 // components/Card.tsx
 import React, { CSSProperties } from 'react';
 
+interface CardProps {
+    title: string;
+    description: string;
+    link: string;
+}
+
 const cardStyle: CSSProperties = {
     border: '1px solid #ddd',
     borderRadius: '8px',
@@ -38,7 +44,7 @@ const linkStyle: CSSProperties = {
     cursor: 'pointer',
 };
 
-const Card = ({ title, description, link }) => {
+const Card: React.FC<CardProps> = ({ title, description, link }) => {
     return (
         <a href={link} style={cardStyle}>
             <div>
