@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSession, useUser } from '@clerk/nextjs';
 import { createClient } from '@supabase/supabase-js';
 import { CSSProperties } from "react";
-import {FaTicketAlt} from "react-icons/fa";
+import { FaTicketAlt } from "react-icons/fa";
 
 interface Product {
     id: number;
@@ -186,6 +186,10 @@ export default function TestCatalogue() {
         }
     };
 
+    function getStockColor(stock_quantity: number) {
+        return stock_quantity > 0 ? '#28a745' : 'red';
+    }
+
     return (
         <div style={styles.catalog}>
             <div style={styles.voucherBox}>
@@ -197,11 +201,18 @@ export default function TestCatalogue() {
                 {availableProducts.map(product => (
                     <div key={product.id} style={styles.itemCard}>
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
-                        <div style={styles.itemName}>{product.name}</div>
-                        <div style={styles.itemDescription}>{product.description}</div>
-                        <div style={styles.itemPrice}>{product.price} Voucher(s)</div>
-                        <div style={styles.itemStock}>In Stock: {product.stock_quantity}</div>
-                        <button style={styles.buyButton} onClick={() => handleButtonClick(product)}>Buy</button>
+                        <h2 style={styles.itemName}>{product.name}</h2>
+                        <p style={styles.itemDescription}>{product.description}</p>
+                        <p style={styles.itemPrice}>${product.price}</p>
+                        <p style={{ ...styles.itemStock, color: getStockColor(product.stock_quantity) }}>
+                            {product.stock_quantity > 0 ? `In Stock: ${product.stock_quantity}` : 'Out of Stock'}
+                        </p>
+                        <button
+                            style={product.stock_quantity > 0 ? styles.buyButton : styles.preOrderButton}
+                            onClick={() => handleButtonClick(product)}
+                        >
+                            {product.stock_quantity > 0 ? 'Buy Now' : 'Pre-Order'}
+                        </button>
                     </div>
                 ))}
             </div>
@@ -213,11 +224,18 @@ export default function TestCatalogue() {
                 {preOrderProducts.map(product => (
                     <div key={product.id} style={styles.itemCard}>
                         <img src={product.image} alt={product.name} style={styles.itemImage} />
-                        <div style={styles.itemName}>{product.name}</div>
-                        <div style={styles.itemDescription}>{product.description}</div>
-                        <div style={styles.itemPrice}>{product.price} Voucher(s)</div>
-                        <div style={styles.itemStock}>Out of Stock</div>
-                        <button style={styles.preOrderButton} onClick={() => handleButtonClick(product)}>Pre-Order</button>
+                        <h2 style={styles.itemName}>{product.name}</h2>
+                        <p style={styles.itemDescription}>{product.description}</p>
+                        <p style={styles.itemPrice}>${product.price}</p>
+                        <p style={{ ...styles.itemStock, color: getStockColor(product.stock_quantity) }}>
+                            {product.stock_quantity > 0 ? `In Stock: ${product.stock_quantity}` : 'Out of Stock'}
+                        </p>
+                        <button
+                            style={product.stock_quantity > 0 ? styles.buyButton : styles.preOrderButton}
+                            onClick={() => handleButtonClick(product)}
+                        >
+                            {product.stock_quantity > 0 ? 'Buy Now' : 'Pre-Order'}
+                        </button>
                     </div>
                 ))}
             </div>
@@ -228,8 +246,10 @@ export default function TestCatalogue() {
                         <h2>{selectedProduct?.name}</h2>
                         <p>{selectedProduct?.description}</p>
                         <p>Price: ${selectedProduct?.price}</p>
-                        <button style={styles.closeButton} onClick={closePopup}>Close</button>
-                        <button style={styles.buyButton} onClick={handlePurchase}>Purchase</button>
+                        <div style={styles.buttonContainer}>
+                            <button style={styles.closeButton} onClick={closePopup}>Cancel</button>
+                            <button style={styles.buyButton} onClick={handlePurchase}>Confirm</button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -305,7 +325,6 @@ const styles: { [key: string]: CSSProperties } = {
     },
     itemStock: {
         fontSize: '16px',
-        color: '#28a745',
     },
     buyButton: {
         marginTop: 'auto',

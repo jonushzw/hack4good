@@ -85,6 +85,20 @@ export default async function AdminPage() {
         return <p>Error fetching transactions.</p>;
     }
 
+    const { data: preorders, error: preordersError } = await supabaseClient.from('preorders').select();
+    if (preordersError) {
+        console.error('Error fetching preorders:', preordersError);
+        return <p>Error fetching preorders.</p>;
+    }
+
+    const preordersWithDetails = preorders.map(preorder => {
+        const user = users.find(u => u.id === preorder.user_id);
+        return {
+            ...preorder,
+            userName: user ? user.id : 'Unknown User',
+        };
+    });
+
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1 style={{ textAlign: 'center', color: '#333', fontSize: '2.5em', marginBottom: '10px' }}>Welcome, Admin</h1>
@@ -97,6 +111,7 @@ export default async function AdminPage() {
                     <TabsTrigger value="products" style={{ padding: '15px 30px', fontSize: '18px' }}>Products</TabsTrigger>
                     <TabsTrigger value="tasks" style={{ padding: '15px 30px', fontSize: '18px' }}>Tasks</TabsTrigger>
                     <TabsTrigger value="transactions" style={{ padding: '15px 30px', fontSize: '18px' }}>Transactions</TabsTrigger>
+                    <TabsTrigger value="preorders" style={{ padding: '15px 30px', fontSize: '18px' }}>Preorders</TabsTrigger>
                 </TabsList>
                 <TabsContent value="users">
                     <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Users List</h2>
@@ -204,7 +219,6 @@ export default async function AdminPage() {
                                 <TableHead>Status</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Date</TableHead>
-
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -215,6 +229,38 @@ export default async function AdminPage() {
                                     <TableCell>{transaction.status}</TableCell>
                                     <TableCell>{transaction.item_name}</TableCell>
                                     <TableCell>{transaction.time_purchased}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TabsContent>
+                <TabsContent value="preorders">
+                    <h2 style={{ color: '#333', fontSize: '2em', marginBottom: '20px' }}>Preorders List</h2>
+                    <Table>
+                        <TableCaption>A list of all preorders.</TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>User ID</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Item ID</TableHead>
+                                <TableHead>Preorder Date</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {preordersWithDetails.map((preorder) => (
+                                <TableRow key={preorder.id}>
+                                    <TableCell>{preorder.id}</TableCell>
+                                    <TableCell>{preorder.user_id}</TableCell>
+                                    <TableCell>{preorder.product_name}</TableCell>
+                                    <TableCell>{preorder.product_id}</TableCell>
+                                    <TableCell>{preorder.preorder_date}</TableCell>
+                                    <TableCell>{preorder.status}</TableCell>
+                                    <TableCell>
+                                        <Link href={`/dashboard/admin/approve-preorder?preorderId=${preorder.user_id}`}>Approve Preorder</Link>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
