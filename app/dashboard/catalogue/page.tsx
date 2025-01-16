@@ -116,7 +116,6 @@ export default function TestCatalogue() {
         if (!selectedProduct || vouchers === null || !user) return;
 
         try {
-            const newStockQuantity = selectedProduct.stock_quantity - 1;
             const newVoucherBalance = vouchers - selectedProduct.price;
 
             if (newVoucherBalance < 0) {
@@ -125,12 +124,37 @@ export default function TestCatalogue() {
                 return;
             }
 
-            const { error: stockError } = await client
-                .from('products')
-                .update({ stock_quantity: newStockQuantity })
-                .eq('id', selectedProduct.id);
-            if (stockError) {
-                throw new Error('Error updating stock quantity');
+            if (selectedProduct.stock_quantity > 0) {
+                const newStockQuantity = selectedProduct.stock_quantity - 1;
+
+                const { error: stockError } = await client
+                    .from('products')
+                    .update({ stock_quantity: newStockQuantity })
+                    .eq('id', selectedProduct.id);
+                if (stockError) {
+                    console.error('Error updating stock quantity:', stockError);
+                    throw new Error('Error updating stock quantity');
+                }
+
+                setProducts(products.map(product =>
+                    product.id === selectedProduct.id
+                        ? { ...product, stock_quantity: newStockQuantity }
+                        : product
+                ));
+            } else {
+                const { error: preorderError } = await client
+                    .from('preorders')
+                    .insert({
+                        user_id: user.id,
+                        product_name: selectedProduct.name,
+                        product_id: selectedProduct.id,
+                        preorder_date: new Date().toISOString(),
+                        status: 'pending',
+                    });
+                if (preorderError) {
+                    console.error('Error inserting preorder:', preorderError);
+                    throw new Error('Error inserting preorder');
+                }
             }
 
             const { error: voucherError } = await client
@@ -138,6 +162,7 @@ export default function TestCatalogue() {
                 .update({ balance: newVoucherBalance })
                 .eq('user_id', user.id);
             if (voucherError) {
+                console.error('Error updating voucher balance:', voucherError);
                 throw new Error('Error updating voucher balance');
             }
 
@@ -150,18 +175,14 @@ export default function TestCatalogue() {
                     vouchers_used: selectedProduct.price,
                 });
             if (transactionError) {
+                console.error('Error inserting transaction history:', transactionError);
                 throw new Error('Error inserting transaction history');
             }
 
-            setProducts(products.map(product =>
-                product.id === selectedProduct.id
-                    ? { ...product, stock_quantity: newStockQuantity }
-                    : product
-            ));
             setVouchers(newVoucherBalance);
             closePopup();
         } catch (err) {
-            console.error(err);
+            console.error('Error during purchase process:', err);
         }
     };
 
