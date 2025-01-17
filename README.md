@@ -1,7 +1,13 @@
 
 # Team ZAJJ | Hack 4 Good 2025
+### Team Members
+1. Jonus Ho Zhi Wen (Team Lead)
+2. Li Sirui
+3. Aninda Metta Citta
+4. Lee Jia Kang
 
 Link to deployment: https://hack4good-khaki.vercel.app/
+Contact us : e1121923@u.nus.edu
 
 ## Scope Of Project
 
