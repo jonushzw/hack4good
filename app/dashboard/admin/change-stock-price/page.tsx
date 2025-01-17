@@ -137,14 +137,21 @@ export default function ChangeStockPrice() {
         setLoading(true);
         setError(null);
 
+        const stockValue = parseFloat(stock);
+        if (stockValue < 0) {
+            setError('Stock quantity cannot be negative');
+            setLoading(false);
+            return;
+        }
+
         try {
             const productExists = await checkProductExists(productId);
             if (productExists) {
-                await updateStock(productId, parseFloat(stock));
+                await updateStock(productId, stockValue);
             } else {
-                await insertStock(productId, parseFloat(stock));
+                await insertStock(productId, stockValue);
             }
-            setCurrentStock(parseFloat(stock));
+            setCurrentStock(stockValue);
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);
@@ -161,9 +168,16 @@ export default function ChangeStockPrice() {
         setLoading(true);
         setError(null);
 
+        const priceValue = parseFloat(price);
+        if (priceValue < 0) {
+            setError('Price cannot be negative');
+            setLoading(false);
+            return;
+        }
+
         try {
-            await updatePrice(productId, parseFloat(price));
-            setCurrentPrice(parseFloat(price));
+            await updatePrice(productId, priceValue);
+            setCurrentPrice(priceValue);
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);

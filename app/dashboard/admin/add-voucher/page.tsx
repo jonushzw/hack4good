@@ -1,4 +1,3 @@
-// In the AddVoucher component
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useSession } from '@clerk/nextjs';
@@ -15,14 +14,6 @@ export default function AddVoucher() {
     const { session } = useSession();
 
     const isAdmin = isSignedIn && user?.publicMetadata.role === 'admin';
-
-    if (!isLoaded) {
-        return <p>Loading...</p>;
-    }
-
-    if (!isAdmin) {
-        return <p>You have no access to this page.</p>;
-    }
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -70,10 +61,14 @@ export default function AddVoucher() {
                 .eq('user_id', userId)
                 .single();
             if (error) {
-                setError('Error fetching voucher balance');
-                setCurrentBalance(null);
+                if (error.code === 'PGRST116') { // No rows found
+                    setCurrentBalance(0);
+                } else {
+                    setError('Error fetching voucher balance, re-enter the user ID');
+                    setCurrentBalance(null);
+                }
             } else {
-                setCurrentBalance(data?.balance ?? null);
+                setCurrentBalance(data?.balance ?? 0);
             }
             setLoading(false);
         }
@@ -124,14 +119,21 @@ export default function AddVoucher() {
         setLoading(true);
         setError(null);
 
+        const balanceValue = parseFloat(balance);
+        if (balanceValue < 0) {
+            setError('Balance cannot be negative');
+            setLoading(false);
+            return;
+        }
+
         try {
             const userExists = await checkUserExists(userId);
             if (userExists) {
-                await updateVoucher(userId, parseFloat(balance));
+                await updateVoucher(userId, balanceValue);
             } else {
-                await insertVoucher(userId, parseFloat(balance));
+                await insertVoucher(userId, balanceValue);
             }
-            setCurrentBalance(parseFloat(balance));
+            setCurrentBalance(balanceValue);
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);
@@ -141,6 +143,14 @@ export default function AddVoucher() {
         }
 
         setLoading(false);
+    }
+
+    if (!isLoaded) {
+        return <p>Loading...</p>;
+    }
+
+    if (!isAdmin) {
+        return <p>You have no access to this page.</p>;
     }
 
     return (
