@@ -6,8 +6,9 @@
 3. Aninda Metta Citta
 4. Lee Jia Kang
 
-Link to deployment: https://hack4good-khaki.vercel.app/
-Contact us : e1121923@u.nus.edu
+**Link to deployment**: https://hack4good-khaki.vercel.app/
+
+**Contact us**: e1121923@u.nus.edu
 
 ## Scope Of Project
 
